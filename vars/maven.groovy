@@ -1,57 +1,36 @@
-/*
-	forma de invocación de método call:
-	def ejecucion = load 'script.groovy'
-	ejecucion.call()
-*/
-def call(){
-  stage("Paso 1: Compliar"){
-    sh "mvn clean compile -e"
-  }
-  stage("Paso 2: Testear"){
+def call(stages){
+    
+    stage("Paso 1: Compliar"){
+        sh "echo 'Compile Code!'"
+        // Run Maven on a Unix agent.
+        sh "mvn clean compile -e"
+    }
+    stage("Paso 2: Testear"){
+            sh "echo 'Test Code!'"
+            // Run Maven on a Unix agent.
+            sh "mvn clean test -e"
+    }
+    stage("Paso 3: Build .Jar"){
+            sh "echo 'Build .Jar!'"
+            // Run Maven on a Unix agent.
+            sh "mvn clean package -e"
+    }
+    stage("Paso 4: Análisis SonarQube"){
+        withSonarQubeEnv('sonarqube1') {
+            sh "echo 'Calling sonar Service in another docker container!'"
+            // Run Maven on a Unix agent to execute Sonar.
+            sh 'mvn clean verify sonar:sonar -Dsonar.projectKey=github-sonar'
+        }
+    }
+    stage("Paso 5: Levantar Springboot APP"){
+        sh 'mvn spring-boot:run &'
+    }
+    stage("Paso 6: Dormir(Esperar 10sg) "){
+        sh 'sleep 10'
+    }
+    stage("Paso 7: Test Alive Service - Testing Application!"){
+        sh 'curl -X GET "http://localhost:8081/rest/mscovid/test?msg=testing"'
+    }
 
-    sh "mvn clean test -e"
-  }
-  stage("Paso 3: Build .Jar"){
-    sh "mvn clean package -e"
-  }
-  stage("Paso 4: Sonar - Análisis Estático"){
-      sh "echo 'Análisis Estático!'"
-      withSonarQubeEnv('sonarqube') {
-          sh 'mvn clean verify sonar:sonar -Dsonar.projectKey=ejemplo-gradle -Dsonar.java.binaries=build'
-      }
-  }
-  stage("Paso 5: Curl Springboot Gradle sleep 20"){
-      sh "gradle bootRun&"
-      sh "sleep 20 && curl -X GET 'http://localhost:8081/rest/mscovid/test?msg=testing'"
-  }
-  stage("Paso 6: Subir Nexus"){
-      nexusPublisher nexusInstanceId: 'nexus',
-      nexusRepositoryId: 'devops-usach-nexus',
-      packages: [
-          [$class: 'MavenPackage',
-              mavenAssetList: [
-                  [classifier: '',
-                  extension: 'jar',
-                  filePath: 'build/DevOpsUsach2020-0.0.1.jar'
-              ]
-          ],
-              mavenCoordinate: [
-                  artifactId: 'DevOpsUsach2020',
-                  groupId: 'com.devopsusach2020',
-                  packaging: 'jar',
-                  version: '0.0.1'
-              ]
-          ]
-      ]
-  }
-  stage("Paso 7: Descargar Nexus"){
-      sh ' curl -X GET -u $NEXUS_USER:$NEXUS_PASSWORD "http://nexus:8081/repository/devops-usach-nexus/com/devopsusach2020/DevOpsUsach2020/0.0.1/DevOpsUsach2020-0.0.1.jar" -O'
-  }
-  stage("Paso 8: Levantar Artefacto Jar"){
-      sh 'nohup bash java -jar DevOpsUsach2020-0.0.1.jar & >/dev/null'
-  }
-  stage("Paso 9: Testear Artefacto - Dormir(Esperar 20sg) "){
-      sh "sleep 20 && curl -X GET 'http://localhost:8081/rest/mscovid/test?msg=testing'"
-  }
 }
 return this;
