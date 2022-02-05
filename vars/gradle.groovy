@@ -2,7 +2,7 @@ import pipeline.*
 
 def call(String chosenStages){
 
-	figlet 'gradle'
+	//figlet 'gradle'
 
 	def pipelineStages = ['buildAndTest','sonar','runJar','rest','nexus']
 
