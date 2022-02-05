@@ -22,7 +22,8 @@ def call(String chosenStages){
 }
 
 def buildAndTest(){
-	sh './gradlew clean build'
+	//sh './gradlew clean build'
+     sh "gradle clean build"
 }
 
 def sonar(){
@@ -35,7 +36,8 @@ def sonar(){
 
 def runJar(){
 	//sh "nohup bash gradlew bootRun &"
-    sh 'nohup bash java -jar DevOpsUsach2020-0.0.1.jar & >/dev/null'
+    //sh 'nohup bash java -jar DevOpsUsach2020-0.0.1.jar & >/dev/null'
+    sh "gradle bootRun&"
 	//sleep 20S
 }
 
@@ -46,13 +48,14 @@ def rest(){
 
 def nexus(){
 nexusPublisher nexusInstanceId: 'nexus',
-    nexusRepositoryId: 'ejemplo-gradle',
+    nexusPublisher nexusInstanceId: 'nexus',
+    nexusRepositoryId: 'devops-usach-nexus',
     packages: [
         [$class: 'MavenPackage',
             mavenAssetList: [
                 [classifier: '',
                 extension: 'jar',
-                filePath: 'build/DevOpsUsach2020-0.0.1.jar'
+                filePath: 'build/libs/DevOpsUsach2020-0.0.1.jar'
             ]
         ],
             mavenCoordinate: [
