@@ -34,8 +34,9 @@ def sonar(){
 }
 
 def runJar(){
-	sh "nohup bash gradlew bootRun &"
-	sleep 20S
+	//sh "nohup bash gradlew bootRun &"
+    sh 'nohup bash java -jar DevOpsUsach2020-0.0.1.jar & >/dev/null'
+	//sleep 20S
 }
 
 def rest(){
