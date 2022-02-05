@@ -22,8 +22,8 @@ def call(String chosenStages){
 }
 
 def buildAndTest(){
-	//sh './gradlew clean build'
-     sh "gradle clean build"
+	sh './gradlew clean build'
+     //sh "gradle clean build"
 }
 
 def sonar(){
@@ -47,7 +47,6 @@ def rest(){
 }
 
 def nexus(){
-nexusPublisher nexusInstanceId: 'nexus',
     nexusPublisher nexusInstanceId: 'nexus',
     nexusRepositoryId: 'devops-usach-nexus',
     packages: [
