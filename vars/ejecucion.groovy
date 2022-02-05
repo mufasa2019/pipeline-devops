@@ -18,9 +18,11 @@ def call(){
                         println 'Herramienta de ejecución seleccionada: ' + params.buildtool
 
                         if (params.buildtool == 'gradle'){
-                            gradle "${params.stages}" 
+                            //gradle "${params.stages}" 
+                            gradle.call(params.stages)
                         } else {
                             maven "${params.stages}"
+                            maven.call(params.stages);
                         }
 
                     }
