@@ -27,21 +27,24 @@ def buildAndTest(){
 
 def sonar(){
 	def sonarhome = tool 'sonarqube'
-    sh "${sonarhome}/bin/sonar-scanner -Dsonar.projectKey=ejemplo-gradle -Dsonar.java.binaries=build"
+    //sh "${sonarhome}/bin/sonar-scanner -Dsonar.projectKey=ejemplo-gradle -Dsonar.java.binaries=build"
+    withSonarQubeEnv('sonarqube') {
+        sh 'mvn clean verify sonar:sonar -Dsonar.projectKey=ejemplo-gradle -Dsonar.java.binaries=build'
+    }
 }
 
 def runJar(){
 	sh "nohup bash gradlew bootRun &"
-	sleep 20
+	sleep 20S
 }
 
 def rest(){
-	sh "curl -X GET http://localhost:8082/rest/mscovid/test?msg=testing"
+	sh "curl -X GET http://localhost:8081/rest/mscovid/test?msg=testing"
 }
 
 def nexus(){
 nexusPublisher nexusInstanceId: 'nexus',
-    nexusRepositoryId: 'devops-usach-nexus',
+    nexusRepositoryId: 'ejemplo-gradle',
     packages: [
         [$class: 'MavenPackage',
             mavenAssetList: [
